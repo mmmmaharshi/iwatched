@@ -1,9 +1,9 @@
 <script lang="ts">
+	import NavBar from '$lib/components/NavBar.svelte';
 	import '@fontsource-variable/fredoka/index.css';
 	import '../app.css';
 	let { children } = $props();
 </script>
 
-<main class="container mx-auto min-h-screen w-full max-w-screen-sm">
-	{@render children()}
-</main>
+<NavBar />
+{@render children()}
