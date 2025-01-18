@@ -3,21 +3,21 @@
 	import MagnifyingGlass from 'phosphor-svelte/lib/MagnifyingGlass';
 </script>
 
-<nav class="bg-base-100 input-bordered sticky top-0 z-50 border-b py-1.5">
+<nav class="input-bordered sticky top-0 z-50 border-b bg-base-100 py-1.5">
 	<section
 		class="container mx-auto flex w-full max-w-screen-md items-center justify-between px-4 pl-0"
 	>
-		<a href="/" class="btn btn-sm btn-ghost gap-0 text-2xl font-semibold">
+		<a href="/" class="btn btn-ghost btn-sm gap-0 text-2xl font-semibold">
 			<p>
-				<span class="text-primary">I</span><span>watched</span>
+				<span class="text-primary">The</span><span>talkie</span>
 			</p>
 		</a>
 		<aside class="flex items-center gap-4">
 			<section class="flex items-center gap-1">
-				<a href="/" class="btn btn-sm btn-ghost h-10">
+				<a href="/" class="btn btn-ghost btn-sm h-10">
 					<MagnifyingGlass size={20} weight="bold" />
 				</a>
-				<a href="/" class="btn btn-sm btn-ghost h-10">
+				<a href="/" class="btn btn-ghost btn-sm h-10">
 					<Binoculars size={25} />
 				</a>
 			</section>

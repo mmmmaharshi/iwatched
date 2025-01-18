@@ -1,64 +1,157 @@
-<script>
+<script lang="ts">
+	import type { PostProps } from '$lib/types';
+
+	let { data }: { data: PostProps } = $props();
+	const {
+		id,
+		caption,
+		posted_time,
+		user: { full_name, profile_pic, username },
+		film_embbed
+	} = data;
+
+	import { formatDistanceToNowStrict } from 'date-fns';
+
+	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
+	import ChatCircle from 'phosphor-svelte/lib/ChatCircle';
+	import Export from 'phosphor-svelte/lib/Export';
 	import Eye from 'phosphor-svelte/lib/Eye';
+	import Heart from 'phosphor-svelte/lib/Heart';
 	import ListNumbers from 'phosphor-svelte/lib/ListNumbers';
+
 	import Star from 'phosphor-svelte/lib/Star';
 </script>
 
-<section class="flex flex-col gap-1.5 py-2 pt-3">
+<a href={'/post/' + id} class="flex flex-col gap-1 pt-3">
 	<header class="px-4">
-		<section class="flex items-center gap-3">
-			<div class="avatar">
-				<div class="w-9 rounded-xl">
-					<img
-						alt="profile_pic"
-						src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-					/>
-				</div>
-			</div>
-			<div class="-space-y-1">
-				<h2 class="font-semibold">Manohar Maharshi</h2>
-				<p class="text-base-content/85 text-sm">@mmmmaharshi</p>
-			</div>
-		</section>
+		{@render userProfile({
+			username,
+			full_name,
+			profile_pic,
+			posted_time
+		})}
 	</header>
-	<p class="px-4 text-[16px] leading-snug">
-		"always great to see a feel-good movie about traveling, recognizing your worth & wearing fun new
-		accessories as you leave a toxic relationship. :) getting rid of a shitty boyfriend can be a
-		real bear."
-	</p>
-	<section class="mt-1.5 px-4">
-		{@render filmEmbbed()}
+	<section class="px-4 pt-0.5">
+		{#if caption.type === 'REVIEW'}
+			<p class="line-clamp-5 text-[16px] leading-snug">
+				REVIEW — {caption.text}
+			</p>
+		{:else if caption.type === 'GENERAL'}
+			<p class="line-clamp-5 text-[16px] leading-snug">
+				{caption.text}
+			</p>
+		{/if}
 	</section>
-</section>
 
-{#snippet filmEmbbed()}
-	<section
-		class="input-bordered bg-base-200 flex h-44 items-start gap-4 overflow-hidden rounded-xl border"
+	{#if film_embbed}
+		<section class="mt-1.5 px-4">
+			{@render filmEmbbed({
+				id: film_embbed.id,
+				title: film_embbed.title,
+				director: film_embbed.director,
+				poster_path: film_embbed.poster_path,
+				storyline: film_embbed.storyline,
+				year: film_embbed.year
+			})}
+		</section>
+	{/if}
+
+	<footer class="mt-0.5 flex items-center justify-between space-y-px px-3">
+		<main>
+			<section class="flex items-center gap-0.5">
+				<button class="btn btn-square btn-ghost btn-sm">
+					<Heart size={21} />
+				</button>
+				<button class="btn btn-square btn-ghost btn-sm">
+					<ChatCircle size={21} />
+				</button>
+				<button class="btn btn-square btn-ghost btn-sm">
+					<Export size={21} />
+				</button>
+			</section>
+			<p class="line-clamp-1 pl-1 text-xs text-base-content/80">
+				{Number(123).toLocaleString()} likes, {Number(2345).toLocaleString()} comments
+			</p>
+		</main>
+		{#if caption.type === 'REVIEW'}
+			<aside>
+				<button class="btn btn-link btn-sm no-underline">Read review <ArrowRight /></button>
+			</aside>
+		{/if}
+	</footer>
+</a>
+
+{#snippet userProfile({
+	full_name,
+	username,
+	profile_pic,
+	posted_time
+}: {
+	full_name: string;
+	username: string;
+	profile_pic: string;
+	posted_time: Date;
+})}
+	<section class="group flex items-center gap-2.5">
+		<div class="avatar input-bordered overflow-hidden rounded-full border">
+			<div class="w-9">
+				<img alt={full_name + 'profile_pic'} src={profile_pic} />
+			</div>
+		</div>
+		<div class="-space-y-0.5">
+			<h2 class="line-clamp-1 font-semibold group-hover:text-primary group-hover:underline">
+				{full_name}
+			</h2>
+			<p class="line-clamp-1 text-sm text-base-content/80">
+				@{username} &middot; {formatDistanceToNowStrict(posted_time)}
+			</p>
+		</div>
+	</section>
+{/snippet}
+
+{#snippet filmEmbbed({
+	id,
+	title,
+	poster_path,
+	year,
+	director,
+	storyline
+}: {
+	id: string;
+	title: string;
+	poster_path: string;
+	year: Date;
+	director: string;
+	storyline: string;
+})}
+	<a
+		href={'/film/' + id}
+		onclick={(e) => {
+			e.stopPropagation();
+		}}
+		class="input-bordered flex h-44 items-start gap-3 overflow-hidden rounded-xl border bg-base-200"
 	>
-		<figure class="bg-base-100 h-full w-28 shrink-0 overflow-hidden lg:w-32">
+		<figure class="h-full w-28 shrink-0 overflow-hidden bg-base-100 lg:w-32">
 			<img
-				src="https://a.ltrbxd.com/resized/film-poster/4/5/9/5/6/4/459564-midsommar-0-1000-0-1500-crop.jpg?v=ed7b8ded1f"
-				alt="movie"
+				src={poster_path}
+				alt={`${title} (${id})`}
 				class="aspect-[2/3] h-full w-full shrink-0 object-cover"
 			/>
 		</figure>
-		<section class="flex h-full w-full flex-col items-start justify-between gap-1 py-2 pr-4">
+		<section class="flex h-full w-full flex-col items-start justify-between gap-1 py-2 pr-3">
 			<header>
-				<h3 class="line-clamp-1 text-lg font-semibold">Midsommar (2019)</h3>
-				<p class="text-base-content/85 line-clamp-1 text-sm">
-					Directed by <span class="font-medium">Ari Aster</span>
+				<h3 class="line-clamp-1 text-lg font-semibold">{title} ({year.getFullYear()})</h3>
+				<p class="line-clamp-1 pt-px text-sm text-base-content/85">
+					Directed by <span class="font-medium text-base-content">{director}</span>
 				</p>
 			</header>
-			<div class="flex flex-1 items-start">
-				<p class="text-base-content/80 line-clamp-4 text-[13px] italic leading-snug">
-					"Several friends travel to Sweden to study as anthropologists a summer festival that is
-					held every ninety years in the remote hometown of one of them. What begins as a dream
-					vacation in a place where the sun never sets, gradually turns into a dark nightmare as the
-					mysterious inhabitants invite them to participate in their disturbing festive activities."
+			<div class="flex flex-1 items-start pt-px">
+				<p class="line-clamp-4 text-[13px] italic leading-snug text-base-content/70">
+					"{storyline}"
 				</p>
 			</div>
 			<footer
-				class="text-base-content/80 flex w-full items-center justify-between gap-5 text-sm lg:justify-start"
+				class="flex w-full items-center justify-between gap-5 text-sm text-base-content/80 lg:justify-start"
 			>
 				<div class="mt-auto flex max-w-max items-center gap-1">
 					<Star size={15} />
@@ -76,5 +169,5 @@
 				</div>
 			</footer>
 		</section>
-	</section>
+	</a>
 {/snippet}
