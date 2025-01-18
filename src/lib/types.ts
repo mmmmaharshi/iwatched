@@ -1,5 +1,7 @@
 export interface PostProps {
 	id: string;
+	likes_count: number;
+	comments_count: number;
 	user: {
 		full_name: string;
 		username: string;

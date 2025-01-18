@@ -7,6 +7,8 @@ export const load = (async ({ url }) => {
 	const data: PostProps[] = [
 		{
 			id: '23456',
+			likes_count: 34543,
+			comments_count: 8765,
 			user: {
 				full_name: 'John Doe',
 				username: 'john_d',
@@ -34,6 +36,8 @@ export const load = (async ({ url }) => {
 		},
 		{
 			id: 'sdfg',
+			likes_count: 87,
+			comments_count: 124,
 			user: {
 				full_name: 'Alice Smith',
 				username: 'alice_s',
