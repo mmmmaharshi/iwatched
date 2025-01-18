@@ -1,7 +1,17 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { PostProps } from '$lib/types';
+	import { cn, sharePost, truncateText } from '$lib/utils';
+	import { formatDistanceToNowStrict } from 'date-fns';
+	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
+	import ChatCircle from 'phosphor-svelte/lib/ChatCircle';
+	import Export from 'phosphor-svelte/lib/Export';
+	import Eye from 'phosphor-svelte/lib/Eye';
+	import Heart from 'phosphor-svelte/lib/Heart';
+	import ListNumbers from 'phosphor-svelte/lib/ListNumbers';
+	import Star from 'phosphor-svelte/lib/Star';
 
-	let { data }: { data: PostProps } = $props();
+	let { data, isPostRoute }: { data: PostProps; isPostRoute: boolean } = $props();
 	const {
 		id,
 		caption,
@@ -9,20 +19,17 @@
 		user: { full_name, profile_pic, username },
 		film_embbed
 	} = data;
-
-	import { formatDistanceToNowStrict } from 'date-fns';
-
-	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
-	import ChatCircle from 'phosphor-svelte/lib/ChatCircle';
-	import Export from 'phosphor-svelte/lib/Export';
-	import Eye from 'phosphor-svelte/lib/Eye';
-	import Heart from 'phosphor-svelte/lib/Heart';
-	import ListNumbers from 'phosphor-svelte/lib/ListNumbers';
-
-	import Star from 'phosphor-svelte/lib/Star';
 </script>
 
-<a href={'/post/' + id} class="flex flex-col gap-1 pt-3">
+<a
+	href={'/post/' + id}
+	onclick={(e) => {
+		if (page.url.pathname === `/post/${id}`) {
+			e.preventDefault();
+		}
+	}}
+	class="flex flex-col gap-1 pt-3"
+>
 	<header class="px-4">
 		{@render userProfile({
 			username,
@@ -33,18 +40,18 @@
 	</header>
 	<section class="px-4 pt-0.5">
 		{#if caption.type === 'REVIEW'}
-			<p class="line-clamp-5 text-[16px] leading-snug">
+			<p class={cn(isPostRoute ? '' : 'line-clamp-5', 'text-[16px] leading-snug')}>
 				REVIEW — {caption.text}
 			</p>
 		{:else if caption.type === 'GENERAL'}
-			<p class="line-clamp-5 text-[16px] leading-snug">
+			<p class={cn(isPostRoute ? '' : 'line-clamp-5', 'text-[16px] leading-snug')}>
 				{caption.text}
 			</p>
 		{/if}
 	</section>
 
 	{#if film_embbed}
-		<section class="mt-1.5 px-4">
+		<section class="mb-0.5 mt-1.5 px-4">
 			{@render filmEmbbed({
 				id: film_embbed.id,
 				title: film_embbed.title,
@@ -65,7 +72,16 @@
 				<button class="btn btn-square btn-ghost btn-sm">
 					<ChatCircle size={21} />
 				</button>
-				<button class="btn btn-square btn-ghost btn-sm">
+				<button
+					type="button"
+					onclick={async (e) => {
+						e.preventDefault();
+						e.stopImmediatePropagation();
+						e.stopPropagation();
+						await sharePost({ title: truncateText(caption.text), url: window.location.href });
+					}}
+					class="btn btn-square btn-ghost btn-sm"
+				>
 					<Export size={21} />
 				</button>
 			</section>
@@ -73,10 +89,12 @@
 				{Number(123).toLocaleString()} likes, {Number(2345).toLocaleString()} comments
 			</p>
 		</main>
-		{#if caption.type === 'REVIEW'}
-			<aside>
-				<button class="btn btn-link btn-sm no-underline">Read review <ArrowRight /></button>
-			</aside>
+		{#if !isPostRoute}
+			{#if caption.type === 'REVIEW'}
+				<aside>
+					<button class="btn btn-link btn-sm no-underline">Read review <ArrowRight /></button>
+				</aside>
+			{/if}
 		{/if}
 	</footer>
 </a>
