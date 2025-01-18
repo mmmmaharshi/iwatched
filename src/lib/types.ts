@@ -16,6 +16,11 @@ export interface PostProps {
 		year: Date;
 		director: string;
 		storyline: string;
+		rating: number;
+		watch_count: number;
+		in_lists_count: number;
 	};
 	posted_time: Date;
 }
+
+export type FilmEmbbedProps = PostProps['film_embbed'];

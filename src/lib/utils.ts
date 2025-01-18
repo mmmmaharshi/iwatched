@@ -23,3 +23,27 @@ export async function sharePost({ title, url }: { title: string; url: string }) 
 export function truncateText(text: string, maxLength: number = 200): string {
 	return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 }
+
+export function convertRatingToFraction(rating: number): string {
+	const integerPart = Math.floor(rating);
+	const decimalPart = rating - integerPart;
+
+	if (decimalPart === 0.5) {
+		return `${integerPart}½`;
+	}
+
+	return rating.toString();
+}
+
+export function convertRatingToStars(rating: number): string {
+	const integerPart = Math.floor(rating);
+	const decimalPart = rating - integerPart;
+
+	let stars = '★'.repeat(integerPart);
+
+	if (decimalPart === 0.5) {
+		stars += '½';
+	}
+
+	return stars;
+}

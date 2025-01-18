@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import type { PostProps } from '$lib/types';
-	import { cn, sharePost, truncateText } from '$lib/utils';
+	import type { FilmEmbbedProps, PostProps } from '$lib/types';
+	import { abbreviateNumber } from 'js-abbreviation-number';
+
+	import {
+		cn,
+		convertRatingToFraction,
+		convertRatingToStars,
+		sharePost,
+		truncateText
+	} from '$lib/utils';
 	import { formatDistanceToNowStrict } from 'date-fns';
 	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
 	import ChatCircle from 'phosphor-svelte/lib/ChatCircle';
@@ -41,7 +49,7 @@
 	<section class="px-4 pt-0.5">
 		{#if caption.type === 'REVIEW'}
 			<p class={cn(isPostRoute ? '' : 'line-clamp-5', 'text-[16px] leading-snug')}>
-				REVIEW — {caption.text}
+				<span class="text-primary">{convertRatingToStars(film_embbed!.rating)}</span> — {caption.text}
 			</p>
 		{:else if caption.type === 'GENERAL'}
 			<p class={cn(isPostRoute ? '' : 'line-clamp-5', 'text-[16px] leading-snug')}>
@@ -58,7 +66,10 @@
 				director: film_embbed.director,
 				poster_path: film_embbed.poster_path,
 				storyline: film_embbed.storyline,
-				year: film_embbed.year
+				year: film_embbed.year,
+				rating: film_embbed.rating,
+				watch_count: film_embbed.watch_count,
+				in_lists_count: film_embbed.in_lists_count
 			})}
 		</section>
 	{/if}
@@ -127,21 +138,7 @@
 	</section>
 {/snippet}
 
-{#snippet filmEmbbed({
-	id,
-	title,
-	poster_path,
-	year,
-	director,
-	storyline
-}: {
-	id: string;
-	title: string;
-	poster_path: string;
-	year: Date;
-	director: string;
-	storyline: string;
-})}
+{#snippet filmEmbbed(data: FilmEmbbedProps)}
 	<a
 		href={'/film/' + id}
 		onclick={(e) => {
@@ -151,39 +148,41 @@
 	>
 		<figure class="h-full w-28 shrink-0 overflow-hidden bg-base-100 lg:w-32">
 			<img
-				src={poster_path}
-				alt={`${title} (${id})`}
+				src={data!.poster_path}
+				alt={`${data!.title} (${id})`}
 				class="aspect-[2/3] h-full w-full shrink-0 object-cover"
 			/>
 		</figure>
-		<section class="flex h-full w-full flex-col items-start justify-between gap-1 py-2 pr-3">
+		<section class="flex h-full w-full flex-col items-start justify-between gap-1 py-2 pr-4">
 			<header>
-				<h3 class="line-clamp-1 text-lg font-semibold">{title} ({year.getFullYear()})</h3>
+				<h3 class="line-clamp-1 text-lg font-semibold">
+					{data!.title} ({data!.year.getFullYear()})
+				</h3>
 				<p class="line-clamp-1 pt-px text-sm text-base-content/85">
-					Directed by <span class="font-medium text-base-content">{director}</span>
+					Directed by <span class="font-medium text-base-content">{data!.director}</span>
 				</p>
 			</header>
 			<div class="flex flex-1 items-start pt-px">
 				<p class="line-clamp-4 text-[13px] italic leading-snug text-base-content/70">
-					"{storyline}"
+					"{data!.storyline}"
 				</p>
 			</div>
 			<footer
-				class="flex w-full items-center justify-between gap-5 text-sm text-base-content/80 lg:justify-start"
+				class="flex w-full items-center justify-between gap-5 text-xs text-base-content/80 md:text-sm lg:justify-start"
 			>
 				<div class="mt-auto flex max-w-max items-center gap-1">
 					<Star size={15} />
-					<span>3.5 ½</span>
+					<span>{data?.rating}</span>
 				</div>
 
 				<div class="mt-auto flex max-w-max items-center gap-1">
 					<Eye size={17} />
-					<span>20</span>
+					<span>{abbreviateNumber(data!.watch_count)}</span>
 				</div>
 
 				<div class=" mt-auto flex max-w-max items-center gap-1">
 					<ListNumbers size={17} />
-					<span>20</span>
+					<span>{abbreviateNumber(data!.in_lists_count)}</span>
 				</div>
 			</footer>
 		</section>

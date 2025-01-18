@@ -25,7 +25,10 @@ export const load = (async ({ url }) => {
 			year: new Date('2010-07-16'),
 			director: 'Christopher Nolan',
 			storyline:
-				"A skilled thief is given a chance to have his past crimes forgiven, by planting an idea into a target's subconscious."
+				"A skilled thief is given a chance to have his past crimes forgiven, by planting an idea into a target's subconscious.",
+			rating: 4.5,
+			in_lists_count: 876,
+			watch_count: 12949586
 		},
 		posted_time: new Date('2025-01-18T10:30:00Z')
 	};
