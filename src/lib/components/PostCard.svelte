@@ -22,6 +22,29 @@
 		user: { full_name, profile_pic, username },
 		film_embbed
 	} = data;
+
+	const handleSharePost = async (
+		e: MouseEvent & {
+			currentTarget: EventTarget & HTMLButtonElement;
+		}
+	) => {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		e.stopPropagation();
+
+		let title = truncateText(`${convertRatingToStars(film_embbed!.rating)} — ${caption.text}`);
+
+		console.log(title);
+
+		if (caption.type === 'REVIEW') {
+			await sharePost({
+				title,
+				url: window?.location?.href
+			});
+		} else {
+			await sharePost({ title: truncateText(caption.text), url: window?.location?.href });
+		}
+	};
 </script>
 
 {#if isPostRoute}
@@ -93,16 +116,7 @@
 				<button class="btn btn-square btn-ghost btn-sm">
 					<ChatCircle size={21} />
 				</button>
-				<button
-					type="button"
-					onclick={async (e) => {
-						e.preventDefault();
-						e.stopImmediatePropagation();
-						e.stopPropagation();
-						await sharePost({ title: truncateText(caption.text), url: window.location.href });
-					}}
-					class="btn btn-square btn-ghost btn-sm"
-				>
+				<button type="button" onclick={handleSharePost} class="btn btn-square btn-ghost btn-sm">
 					<Export size={21} />
 				</button>
 			</div>
